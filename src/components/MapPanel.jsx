@@ -41,18 +41,27 @@ export default function MapPanel() {
 
       <div className="w-full h-[430px] rounded-xl overflow-hidden border border-border">
         <MapContainer
-          center={center}
-          zoom={18}
-          scrollWheelZoom={true}
-          preferCanvas={true}
-          zoomControl={true}
-          className="w-full h-full"
+            center={center}
+            zoom={19}
+            minZoom={17}
+            maxZoom={19}
+            maxBounds={[
+                [13.040, 80.270],
+                [13.075, 80.305],
+            ]}
+            maxBoundsViscosity={1.0}
+            scrollWheelZoom={true}
+            preferCanvas={true}
+            zoomControl={true}
+            className="w-full h-full"
         >
-          <TileLayer
+        <TileLayer
             url="http://localhost:8080/data/marina_beach/{z}/{x}/{y}.png"
             attribution="Offline Marina Beach Map"
-            maxZoom={20}
-          />
+            minZoom={17}
+            maxZoom={19}
+            noWrap={true}
+        />
 
           <Marker position={robotPosition}>
             <Popup>Robot Current Position</Popup>
