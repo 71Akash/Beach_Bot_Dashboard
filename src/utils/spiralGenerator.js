@@ -70,3 +70,32 @@ export function calculateDistance(path) {
 
   return dist;
 }
+
+export function calculatePolygonArea(latlngs) {
+  if (!latlngs || latlngs.length < 4) return 0;
+
+  const coords = latlngs.map((p) => [p[1], p[0]]);
+  coords.push([latlngs[0][1], latlngs[0][0]]);
+
+  const polygon = turf.polygon([coords]);
+  return turf.area(polygon); // m²
+}
+
+export function calculatePolygonPerimeter(latlngs) {
+  if (!latlngs || latlngs.length < 4) return 0;
+
+  let perimeter = 0;
+
+  for (let i = 0; i < latlngs.length; i++) {
+    const p1 = latlngs[i];
+    const p2 = latlngs[(i + 1) % latlngs.length];
+
+    perimeter += turf.distance(
+      turf.point([p1[1], p1[0]]),
+      turf.point([p2[1], p2[0]]),
+      { units: "meters" }
+    );
+  }
+
+  return perimeter;
+}

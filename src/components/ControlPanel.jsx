@@ -1,6 +1,10 @@
 import { Play, Square, Save, Trash2, Route } from "lucide-react";
 
 export default function ControlPanel({
+  robotWidth,
+  setRobotWidth,
+  missionName,
+  setMissionName,
   onGenerateSpiral,
   onClearPoints,
   onClearSpiral,
@@ -8,11 +12,42 @@ export default function ControlPanel({
   const buttonStyle =
     "flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-medium transition border border-border bg-slate-800 hover:bg-slate-700";
 
+  const inputStyle =
+    "w-full rounded-xl border border-border bg-slate-800 px-4 py-3 text-text outline-none focus:ring-2 focus:ring-primary";
+
   return (
     <section className="bg-panel border border-border rounded-2xl shadow-panel p-4">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Control Panel</h2>
-        <span className="text-sm text-muted">Mission Controls</span>
+        <h2 className="text-lg font-semibold">Mission Planning</h2>
+        <span className="text-sm text-muted">Coverage Controls</span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label className="block text-sm text-muted mb-2">Mission Name</label>
+          <input
+            type="text"
+            className={inputStyle}
+            value={missionName}
+            onChange={(e) => setMissionName(e.target.value)}
+            placeholder="Enter mission name"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm text-muted mb-2">
+            Robot Cleaning Width (m)
+          </label>
+          <input
+            type="number"
+            step="0.1"
+            min="0.1"
+            className={inputStyle}
+            value={robotWidth}
+            onChange={(e) => setRobotWidth(e.target.value)}
+            placeholder="1.0"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
