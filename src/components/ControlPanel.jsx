@@ -1,6 +1,10 @@
 import { Play, Square, Save, Trash2, Route } from "lucide-react";
 
-export default function ControlPanel() {
+export default function ControlPanel({
+  onGenerateSpiral,
+  onClearPoints,
+  onClearSpiral,
+}) {
   const buttonStyle =
     "flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-medium transition border border-border bg-slate-800 hover:bg-slate-700";
 
@@ -12,29 +16,34 @@ export default function ControlPanel() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <button className={buttonStyle}>
+        <button className={buttonStyle} onClick={onGenerateSpiral}>
           <Route size={18} />
           Generate Spiral
         </button>
+
         <button className={buttonStyle}>
           <Play size={18} className="text-success" />
           Start Simulation
         </button>
+
         <button className={buttonStyle}>
           <Square size={18} className="text-danger" />
           Stop Simulation
         </button>
+
         <button className={buttonStyle}>
           <Save size={18} />
           Save Path
         </button>
-        <button className={buttonStyle}>
+
+        <button className={buttonStyle} onClick={onClearPoints}>
           <Trash2 size={18} />
           Clear Points
         </button>
-        <button className={buttonStyle}>
-          <Save size={18} />
-          Save Recording
+
+        <button className={buttonStyle} onClick={onClearSpiral}>
+          <Trash2 size={18} />
+          Clear Spiral
         </button>
       </div>
     </section>
