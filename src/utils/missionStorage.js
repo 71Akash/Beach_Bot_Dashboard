@@ -12,5 +12,4 @@ export function deleteMission(index) {
   const existing = JSON.parse(localStorage.getItem("savedMissions") || "[]");
   existing.splice(index, 1);
   localStorage.setItem("savedMissions", JSON.stringify(existing));
-  localStorage.setItem("currentMission", JSON.stringify(null));
 }

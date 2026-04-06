@@ -4,6 +4,9 @@ export default function RobotStatus({
   pathDistance,
   waypointCount,
   robotWidth,
+  progress,
+  coveredDistance,
+  isSimulating,
 }) {
   const statCard =
     "rounded-xl border border-border bg-slate-800 p-4 flex flex-col gap-1";
@@ -12,7 +15,9 @@ export default function RobotStatus({
     <section className="bg-panel border border-border rounded-2xl shadow-panel p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Mission Metrics</h2>
-        <span className="text-sm text-success">READY</span>
+        <span className={`text-sm ${isSimulating ? "text-warning" : "text-success"}`}>
+          {isSimulating ? "SIMULATING" : "READY"}
+        </span>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -43,7 +48,19 @@ export default function RobotStatus({
 
         <div className={statCard}>
           <span className="text-sm text-muted">Coverage Status</span>
-          <span className="text-xl font-semibold">Planned</span>
+          <span className="text-xl font-semibold">
+            {isSimulating ? "Running" : "Planned"}
+          </span>
+        </div>
+
+        <div className={statCard}>
+          <span className="text-sm text-muted">Progress</span>
+          <span className="text-xl font-semibold">{progress.toFixed(1)}%</span>
+        </div>
+
+        <div className={statCard}>
+          <span className="text-sm text-muted">Distance Covered</span>
+          <span className="text-xl font-semibold">{coveredDistance.toFixed(1)} m</span>
         </div>
       </div>
     </section>
