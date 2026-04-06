@@ -96,7 +96,9 @@ export default function Dashboard() {
       return;
     }
 
-    const spiral = generatePolygonSpiral(selectedPoints, Number(robotWidth));
+    const orderedPoints = sortPointsClockwise(selectedPoints);
+    const spiral = generatePolygonSpiral(orderedPoints, Number(robotWidth));
+    setSelectedPoints(orderedPoints);
     setSpiralPath(spiral);
     setSimulatedPathIndex(0);
     setSimulatedTrail([]);
@@ -209,6 +211,50 @@ export default function Dashboard() {
     }
   };
 
+  const handleUndoLastPoint = () => {
+    if (selectedPoints.length === 0) {
+      addToast("Nothing to undo", "", "warning");
+      return;
+    }
+
+    const removed = selectedPoints[selectedPoints.length - 1];
+
+    setSelectedPoints((prev) => prev.slice(0, -1));
+    setSpiralPath([]);
+
+    addLog("Last boundary point removed");
+    addToast(
+      "Point removed",
+      `Lat: ${removed[0].toFixed(6)}, Lng: ${removed[1].toFixed(6)}`,
+      "info"
+    );
+  };
+
+  const handleUpdatePoint = (index, newPoint) => {
+    setSelectedPoints((prev) => {
+      const updated = [...prev];
+      updated[index] = newPoint;
+      return updated;
+    });
+
+    setSpiralPath([]);
+
+    addLog(`Boundary point ${index + 1} adjusted`);
+  };
+
+  const sortPointsClockwise = (points) => {
+    const center = points.reduce(
+      (acc, p) => [acc[0] + p[0], acc[1] + p[1]],
+      [0, 0]
+    ).map((v) => v / points.length);
+
+    return [...points].sort((a, b) => {
+      const angleA = Math.atan2(a[0] - center[0], a[1] - center[1]);
+      const angleB = Math.atan2(b[0] - center[0], b[1] - center[1]);
+      return angleA - angleB;
+    });
+  };
+     
   useEffect(() => {
     return () => stopSimulation(true);
   }, []);
@@ -243,6 +289,7 @@ export default function Dashboard() {
             simulatedRobotPosition={simulatedRobotPosition}
             simulatedTrail={simulatedTrail}
             isSimulating={isSimulating}
+            onUpdatePoint={handleUpdatePoint}
           />
         </div>
 
@@ -266,6 +313,7 @@ export default function Dashboard() {
             onStartSimulation={startSimulation}
             onStopSimulation={stopSimulation}
             isSimulating={isSimulating}
+            onUndoLastPoint={handleUndoLastPoint}
           />
         </div>
 

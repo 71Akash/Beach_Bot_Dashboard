@@ -1,4 +1,4 @@
-import { Play, Square, Save, Trash2, Route, Upload, FolderOpen } from "lucide-react";
+import { Play, Square, Save, Trash2, Route, Upload, FolderOpen, CornerUpLeft } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 
 export default function ControlPanel({
@@ -16,6 +16,7 @@ export default function ControlPanel({
   onStartSimulation,
   onStopSimulation,
   isSimulating,
+  onUndoPoint,
 }) {
   const buttonStyle =
     "flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-medium transition border border-border bg-slate-800 hover:bg-slate-700 hover:scale-[1.01] active:scale-[0.99]";
@@ -110,6 +111,12 @@ export default function ControlPanel({
           <Upload size={18} />
           Send to Robot
         </button>
+
+        <button className={buttonStyle} onClick={onUndoPoint}>
+          <CornerUpLeft size={18} />
+          Undo Point
+        </button>
+
       </div>
 
       <div className="border-t border-border pt-4">

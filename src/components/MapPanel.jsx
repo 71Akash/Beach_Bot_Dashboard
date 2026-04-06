@@ -598,6 +598,7 @@ export default function MapPanel({
   simulatedRobotPosition,
   simulatedTrail,
   isSimulating,
+  onUpdatePoint
 }) {
   const center = [12.943530, 80.136811];
 
@@ -641,7 +642,7 @@ export default function MapPanel({
         <div>
           <h2 className="text-lg font-semibold">Mission Map</h2>
           <p className="text-sm text-muted">
-            Select 4 corner points to define the work area
+            Click to add points. Drag to adjust boundaries. Use undo if needed.
           </p>
         </div>
 
@@ -716,9 +717,20 @@ export default function MapPanel({
             <Marker
               key={index}
               position={point}
+              draggable={true}
               icon={createNumberedIcon(index + 1)}
+              eventHandlers={{
+                dragend: (e) => {
+                  const { lat, lng } = e.target.getLatLng();
+
+                  const updatedPoints = [...selectedPoints];
+                  updatedPoints[index] = [lat, lng];
+
+                  onUpdatePoint(index, [lat, lng]);
+                },
+              }}
             >
-              <Popup>Boundary Point {index + 1}</Popup>
+              <Popup>Boundary Point {index + 1} (Drag to adjust)</Popup>
             </Marker>
           ))}
 
