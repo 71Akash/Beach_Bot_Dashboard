@@ -5,6 +5,7 @@ import CameraPanel from "../components/CameraPanel";
 import ControlPanel from "../components/ControlPanel";
 import RobotStatus from "../components/RobotStatus";
 import SystemLogs from "../components/SystemLogs";
+import ToastContainer from "../components/ToastContainer";
 import {
   generatePolygonSpiral,
   calculateDistance,
@@ -24,31 +25,74 @@ export default function Dashboard() {
   const [missionName, setMissionName] = useState("Marina Cleanup Mission");
   const [savedMissions, setSavedMissions] = useState(getSavedMissions());
 
+  // Logs + Toasts
+  const [logs, setLogs] = useState([
+    `[${new Date().toLocaleTimeString()}] Dashboard initialized`,
+    `[${new Date().toLocaleTimeString()}] Offline map ready`,
+    `[${new Date().toLocaleTimeString()}] Mission planner armed`,
+  ]);
+  const [toasts, setToasts] = useState([]);
+
   // Simulation states
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulatedPathIndex, setSimulatedPathIndex] = useState(0);
   const [simulatedTrail, setSimulatedTrail] = useState([]);
   const intervalRef = useRef(null);
 
+  const addLog = (message) => {
+    const timestamp = new Date().toLocaleTimeString();
+    setLogs((prev) => [`[${timestamp}] ${message}`, ...prev.slice(0, 49)]);
+  };
+
+  const addToast = (title, message = "", type = "info") => {
+    const id = Date.now() + Math.random();
+    const toast = { id, title, message, type };
+
+    setToasts((prev) => [toast, ...prev]);
+
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3000);
+  };
+
   const handleAddPoint = (point) => {
-    if (selectedPoints.length >= 4) return;
+    if (selectedPoints.length >= 4) {
+      addToast("Maximum points reached", "Only 4 boundary points are allowed.", "warning");
+      return;
+    }
+
+    const pointNumber = selectedPoints.length + 1;
     setSelectedPoints((prev) => [...prev, point]);
+
+    addLog(`Boundary Point ${pointNumber} selected`);
+    addToast(
+      `Point ${pointNumber} added`,
+      `Lat: ${point[0].toFixed(6)}, Lng: ${point[1].toFixed(6)}`,
+      "info"
+    );
   };
 
   const handleClearPoints = () => {
     setSelectedPoints([]);
     setSpiralPath([]);
-    stopSimulation();
+    stopSimulation(true);
+
+    addLog("Boundary points and mission path cleared");
+    addToast("Points cleared", "Work area selection has been reset.", "warning");
   };
 
   const handleClearSpiral = () => {
     setSpiralPath([]);
-    stopSimulation();
+    stopSimulation(true);
+
+    addLog("Spiral path cleared");
+    addToast("Spiral cleared", "Generated mission path removed.", "warning");
   };
 
   const handleGenerateSpiral = () => {
     if (selectedPoints.length < 4) {
-      alert("Please select 4 boundary points first.");
+      addLog("Spiral generation failed: insufficient boundary points");
+      addToast("Cannot generate spiral", "Please select 4 boundary points first.", "error");
       return;
     }
 
@@ -57,11 +101,19 @@ export default function Dashboard() {
     setSimulatedPathIndex(0);
     setSimulatedTrail([]);
     setIsSimulating(false);
+
+    addLog(`Spiral generated successfully (${spiral.length} waypoints)`);
+    addToast(
+      "Spiral generated",
+      `${spiral.length} waypoints created using ${robotWidth}m spacing.`,
+      "success"
+    );
   };
 
   const handleSaveMission = () => {
     if (selectedPoints.length < 4 || spiralPath.length < 2) {
-      alert("Please define an area and generate a spiral first.");
+      addLog("Mission save failed: incomplete mission");
+      addToast("Save failed", "Please define an area and generate a spiral first.", "error");
       return;
     }
 
@@ -75,22 +127,28 @@ export default function Dashboard() {
 
     saveMissionToLocal(mission);
     setSavedMissions(getSavedMissions());
-    alert("Mission saved successfully.");
+
+    addLog(`Mission saved locally: ${missionName}`);
+    addToast("Mission saved", `${missionName} stored locally.`, "success");
   };
 
   const handleLoadMission = (mission) => {
-    stopSimulation();
+    stopSimulation(true);
     setMissionName(mission.missionName || "Loaded Mission");
     setRobotWidth(mission.robotWidth || 1.0);
     setSelectedPoints(mission.selectedPoints || []);
     setSpiralPath(mission.spiralPath || []);
     setSimulatedPathIndex(0);
     setSimulatedTrail([]);
+
+    addLog(`Mission loaded: ${mission.missionName}`);
+    addToast("Mission loaded", `${mission.missionName} restored successfully.`, "success");
   };
 
   const handleSendMission = () => {
     if (!spiralPath.length) {
-      alert("No spiral path available to send.");
+      addLog("Mission transmit failed: no spiral path");
+      addToast("Send failed", "No spiral path available to send.", "error");
       return;
     }
 
@@ -104,25 +162,30 @@ export default function Dashboard() {
     };
 
     socket.emit("mission_path", payload);
-    alert("Mission path sent to robot backend.");
+
+    addLog(`Mission transmitted: ${missionName} (${spiralPath.length} waypoints)`);
+    addToast("Mission sent", "Mission payload sent to robot backend (mocked).", "success");
   };
 
-  // -----------------------------
-  // Simulation logic
-  // -----------------------------
   const startSimulation = () => {
     if (!spiralPath.length) {
-      alert("Generate a spiral path first.");
+      addLog("Simulation start failed: no spiral path");
+      addToast("Simulation unavailable", "Generate a spiral path first.", "error");
       return;
     }
 
-    stopSimulation();
+    stopSimulation(true);
     setIsSimulating(true);
+
+    addLog("Simulation started");
+    addToast("Simulation started", "Robot playback has begun.", "success");
 
     intervalRef.current = setInterval(() => {
       setSimulatedPathIndex((prev) => {
         if (prev >= spiralPath.length - 1) {
-          stopSimulation();
+          stopSimulation(true);
+          addLog("Simulation completed");
+          addToast("Simulation complete", "Mission playback finished.", "success");
           return prev;
         }
 
@@ -130,19 +193,24 @@ export default function Dashboard() {
         setSimulatedTrail((trail) => [...trail, spiralPath[nextIndex]]);
         return nextIndex;
       });
-    }, 200); // speed of simulation
+    }, 200);
   };
 
-  const stopSimulation = () => {
+  const stopSimulation = (silent = false) => {
     setIsSimulating(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
+
+      if(!silent){
+        addLog("Simulation stopped");
+        addToast("Simulation stopped", "Mission playback halted.", "warning");
+      }
     }
   };
 
   useEffect(() => {
-    return () => stopSimulation();
+    return () => stopSimulation(true);
   }, []);
 
   const simulatedRobotPosition =
@@ -154,10 +222,7 @@ export default function Dashboard() {
   const perimeter = useMemo(() => calculatePolygonPerimeter(selectedPoints), [selectedPoints]);
   const pathDistance = useMemo(() => calculateDistance(spiralPath), [spiralPath]);
   const waypointCount = spiralPath.length;
-  const coveredDistance = useMemo(
-    () => calculateDistance(simulatedTrail),
-    [simulatedTrail]
-  );
+  const coveredDistance = useMemo(() => calculateDistance(simulatedTrail), [simulatedTrail]);
 
   const progress = useMemo(() => {
     if (!spiralPath.length) return 0;
@@ -167,6 +232,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background text-text">
       <Navbar />
+      <ToastContainer toasts={toasts} />
 
       <main className="p-4 grid grid-cols-1 xl:grid-cols-12 gap-4">
         <div className="xl:col-span-7">
@@ -217,7 +283,7 @@ export default function Dashboard() {
         </div>
 
         <div className="xl:col-span-12">
-          <SystemLogs />
+          <SystemLogs logs={logs} />
         </div>
       </main>
     </div>
