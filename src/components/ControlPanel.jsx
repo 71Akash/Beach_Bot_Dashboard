@@ -1,4 +1,5 @@
-import { Play, Square, Save, Trash2, Route, Upload } from "lucide-react";
+import { Play, Square, Save, Trash2, Route, Upload, FolderOpen } from "lucide-react";
+import StatusBadge from "./StatusBadge";
 
 export default function ControlPanel({
   robotWidth,
@@ -17,16 +18,25 @@ export default function ControlPanel({
   isSimulating,
 }) {
   const buttonStyle =
-    "flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-medium transition border border-border bg-slate-800 hover:bg-slate-700";
+    "flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-medium transition border border-border bg-slate-800 hover:bg-slate-700 hover:scale-[1.01] active:scale-[0.99]";
 
   const inputStyle =
     "w-full rounded-xl border border-border bg-slate-800 px-4 py-3 text-text outline-none focus:ring-2 focus:ring-primary";
 
   return (
-    <section className="bg-panel border border-border rounded-2xl shadow-panel p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Mission Planning</h2>
-        <span className="text-sm text-muted">Coverage Controls</span>
+    <section className="bg-panel border border-border rounded-2xl shadow-panel p-5">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
+        <div>
+          <h2 className="text-lg font-semibold">Mission Planning Console</h2>
+          <p className="text-sm text-muted">
+            Configure, simulate, store, and deploy cleaning paths
+          </p>
+        </div>
+
+        <StatusBadge
+          label={isSimulating ? "MISSION RUNNING" : "READY TO PLAN"}
+          color={isSimulating ? "yellow" : "green"}
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -103,27 +113,30 @@ export default function ControlPanel({
       </div>
 
       <div className="border-t border-border pt-4">
-        <h3 className="text-md font-semibold mb-3">Saved Missions</h3>
+        <div className="flex items-center gap-2 mb-3">
+          <FolderOpen size={18} className="text-primary" />
+          <h3 className="text-md font-semibold">Saved Missions</h3>
+        </div>
 
         {savedMissions.length === 0 ? (
           <p className="text-sm text-muted">No saved missions yet.</p>
         ) : (
-          <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
+          <div className="space-y-3 max-h-[240px] overflow-y-auto pr-1">
             {savedMissions.map((mission, index) => (
               <div
                 key={index}
-                className="rounded-xl border border-border bg-slate-800 p-3 flex items-center justify-between"
+                className="rounded-xl border border-border bg-slate-800/90 p-4 flex items-center justify-between"
               >
                 <div>
                   <p className="font-medium">{mission.missionName}</p>
-                  <p className="text-xs text-muted">
+                  <p className="text-xs text-muted mt-1">
                     Width: {mission.robotWidth} m • Waypoints: {mission.spiralPath?.length || 0}
                   </p>
                 </div>
 
                 <button
                   onClick={() => onLoadMission(mission)}
-                  className="px-3 py-2 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm"
+                  className="px-4 py-2 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-medium"
                 >
                   Load
                 </button>
