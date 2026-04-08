@@ -15,6 +15,7 @@ import {
 import {
   saveMissionToLocal,
   getSavedMissions,
+  deleteMission
 } from "../utils/missionStorage";
 import socket from "../services/socket";
 
@@ -56,8 +57,8 @@ export default function Dashboard() {
   };
 
   const handleAddPoint = (point) => {
-    if (selectedPoints.length >= 4) {
-      addToast("Maximum points reached", "Only 4 boundary points are allowed.", "warning");
+    if (selectedPoints.length >= 10) {
+      addToast("Maximum points reached", "Only up to 10 boundary points are allowed.", "warning");
       return;
     }
 
@@ -92,7 +93,7 @@ export default function Dashboard() {
   const handleGenerateSpiral = () => {
     if (selectedPoints.length < 4) {
       addLog("Spiral generation failed: insufficient boundary points");
-      addToast("Cannot generate spiral", "Please select 4 boundary points first.", "error");
+      addToast("Cannot generate spiral", "Please select at least 4 boundary points first.", "error");
       return;
     }
 
@@ -167,6 +168,14 @@ export default function Dashboard() {
 
     addLog(`Mission transmitted: ${missionName} (${spiralPath.length} waypoints)`);
     addToast("Mission sent", "Mission payload sent to robot backend (mocked).", "success");
+  };
+
+  const handleDeleteMission = (index, missionName = "Mission") => {
+    deleteMission(index);
+    setSavedMissions(getSavedMissions());
+
+    addLog(`Mission deleted: ${missionName}`);
+    addToast("Mission deleted", `${missionName} removed from saved missions.`, "warning");
   };
 
   const startSimulation = () => {
@@ -314,6 +323,7 @@ export default function Dashboard() {
             onStopSimulation={stopSimulation}
             isSimulating={isSimulating}
             onUndoPoint={handleUndoLastPoint}
+            onDeleteMission={handleDeleteMission}
           />
         </div>
 
@@ -327,6 +337,7 @@ export default function Dashboard() {
             progress={progress}
             coveredDistance={coveredDistance}
             isSimulating={isSimulating}
+            selectedPointCount={selectedPoints.length}
           />
         </div>
 

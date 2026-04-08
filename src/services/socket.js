@@ -9,6 +9,8 @@
 
 // export default socket;
 
+// updates needed when connecting to real robot server, for now this is a mock socket that logs emitted events to the console. 
+// This allows the dashboard to function without a backend during development and testing.
 const socket = {
   on: () => {},
   off: () => {},

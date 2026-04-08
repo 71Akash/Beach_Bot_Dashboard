@@ -582,7 +582,7 @@ function FollowRobot({ position }) {
 function MapClickHandler({ onAddPoint, pointCount }) {
   useMapEvents({
     click(e) {
-      if (pointCount >= 4) return;
+      if (pointCount >= 10) return;
       const { lat, lng } = e.latlng;
       onAddPoint([lat, lng]);
     },
@@ -642,7 +642,7 @@ export default function MapPanel({
         <div>
           <h2 className="text-lg font-semibold">Mission Map</h2>
           <p className="text-sm text-muted">
-            Click to add points. Drag to adjust boundaries. Use undo if needed.
+            Click to add 4-10 boundary points. Drag to adjust boundaries. Use undo if needed.
           </p>
         </div>
 
@@ -651,7 +651,7 @@ export default function MapPanel({
             label={isSimulating ? "SIMULATION ACTIVE" : "PLANNING MODE"}
             color={isSimulating ? "yellow" : "blue"}
           />
-          <StatusBadge label={`POINTS: ${selectedPoints.length}/4`} color="slate" />
+          <StatusBadge label={`POINTS: ${selectedPoints.length}/10`} color="slate" />
           <StatusBadge label={`PATH: ${spiralPath.length} WPTS`} color="green" />
         </div>
       </div>
@@ -735,7 +735,7 @@ export default function MapPanel({
           ))}
 
           {/* Work Area Polygon */}
-          {selectedPoints.length === 4 && (
+          {selectedPoints.length >= 4 && (
             <Polygon
               positions={selectedPoints}
               pathOptions={{

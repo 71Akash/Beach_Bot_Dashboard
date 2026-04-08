@@ -17,6 +17,7 @@ export default function ControlPanel({
   onStopSimulation,
   isSimulating,
   onUndoPoint,
+  onDeleteMission
 }) {
   const buttonStyle =
     "flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-medium transition border border-border bg-slate-800 hover:bg-slate-700 hover:scale-[1.01] active:scale-[0.99]";
@@ -68,10 +69,15 @@ export default function ControlPanel({
         </div>
       </div>
 
+      <div className="mb-6 rounded-xl border border-border bg-slate-800/60 px-4 py-3 text-sm text-muted">
+        Define the cleaning boundary using <span className="text-text font-medium">4 to 10 map points</span>.  
+        Spiral generation requires a minimum of 4 valid points.
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         <button className={buttonStyle} onClick={onGenerateSpiral}>
           <Route size={18} />
-          Generate Spiral
+          Generate Path
         </button>
 
         <button
@@ -104,7 +110,7 @@ export default function ControlPanel({
 
         <button className={buttonStyle} onClick={onClearSpiral}>
           <Trash2 size={18} />
-          Clear Spiral
+          Clear Path
         </button>
 
         <button className={buttonStyle} onClick={onSendMission}>
@@ -132,21 +138,30 @@ export default function ControlPanel({
             {savedMissions.map((mission, index) => (
               <div
                 key={index}
-                className="rounded-xl border border-border bg-slate-800/90 p-4 flex items-center justify-between"
+                className="rounded-xl border border-border bg-slate-800/90 p-4 flex items-center justify-between gap-4"
               >
-                <div>
+                <div className="min-w-0">
                   <p className="font-medium">{mission.missionName}</p>
                   <p className="text-xs text-muted mt-1">
                     Width: {mission.robotWidth} m • Waypoints: {mission.spiralPath?.length || 0}
                   </p>
                 </div>
-
-                <button
-                  onClick={() => onLoadMission(mission)}
-                  className="px-4 py-2 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-medium"
-                >
-                  Load
-                </button>
+                <div className="flex items-center gap-2 shink-0">
+                  <button
+                    onClick={() => onLoadMission(mission)}
+                    className="px-4 py-2 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-medium"
+                  >
+                    Load
+                  </button>
+                  
+                  <button
+                    onClick={() => onDeleteMission(index, mission.missionName)}
+                    className="p-2 rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400"
+                    title="Delete Mission"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>

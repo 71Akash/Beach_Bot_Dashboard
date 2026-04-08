@@ -9,6 +9,7 @@ export default function RobotStatus({
   progress,
   coveredDistance,
   isSimulating,
+  selectedPointCount
 }) {
   const statCard =
     "rounded-2xl border border-border bg-slate-800/90 p-4 flex flex-col gap-1 shadow-sm";
@@ -46,14 +47,19 @@ export default function RobotStatus({
         </div>
 
         <div className={statCard}>
-          <span className="text-sm text-muted">Waypoints</span>
-          <span className="text-2xl font-semibold">{waypointCount}</span>
+          <span className="text-sm text-muted">Selected Points</span>
+          <span className="text-2xl font-semibold">{selectedPointCount}</span>
         </div>
 
         <div className={statCard}>
           <span className="text-sm text-muted">Robot Width</span>
           <span className="text-2xl font-semibold">{robotWidth} m</span>
         </div>
+
+        {/* <div className={statCard}>
+          <span className="text-sm text-muted">Boundary Points</span>
+          <span className="text-2xl font-semibold">{selectedPointCount}</span>
+        </div> */}
 
         <div className={statCard}>
           <span className="text-sm text-muted">Coverage Status</span>
