@@ -659,9 +659,9 @@ export default function MapPanel({
       <div className="w-full h-[485px] rounded-xl overflow-hidden border border-border relative">
         <MapContainer
           center={center}
-          zoom={19}
+          zoom={18}
           minZoom={17}
-          maxZoom={19}
+          maxZoom={18}
           maxBounds={[
             // [13.040, 80.270],
             // [13.075, 80.305],

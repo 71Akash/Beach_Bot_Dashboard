@@ -69,7 +69,7 @@ export default function ControlPanel({
         </div>
       </div>
 
-      <div className="mb-6 rounded-xl border border-border bg-slate-800/60 px-4 py-3 text-sm text-muted">
+      <div className="mb-6 rounded-xl border border-border bg-slate-800/60 px-3 py-3 text-large text-muted">
         Define the cleaning boundary using <span className="text-text font-medium">4 to 10 map points</span>.  
         Spiral generation requires a minimum of 4 valid points.
       </div>
